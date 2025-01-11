@@ -71,7 +71,7 @@ const setupPopover = async (sections: Section[], applyResult: ApplyResult) => {
     if (!ok) {
       return;
     }
-    chrome.storage.sync.clear();
+    chrome.storage.local.clear();
   };
   popup.appendChild(clearSkippedBtn);
 };
@@ -270,4 +270,4 @@ const extractSections = (): Section[] => {
 })();
 
 // migration
-// Object.entries(await chrome.storage.sync.get()).filter(([k,v])=>k !== 'config').reduce((acc, [k, v])=>{const key = k.split(/[\t\n]+/)[2]; key===undefined && console.log(k); return {...acc, [key]: v}}, {})
+// Object.entries(await chrome.storage.local.get()).filter(([k,v])=>k !== 'config').reduce((acc, [k, v])=>{const key = k.split(/[\t\n]+/)[2]; key===undefined && console.log(k); return {...acc, [key]: v}}, {})
