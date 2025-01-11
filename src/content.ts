@@ -84,11 +84,9 @@ const setupPage = (sections: Section[]) => {
     skipAllBtn.style.float = 'right';
     skipAllBtn.style.marginLeft = '5px';
     skipAllBtn.style.marginTop = '8px';
-    skipAllBtn.onclick = () => {
-      if (!confirm('you sure?')) {
-        return;
-      }
-      markAllAsIgnored(sections);
+    skipAllBtn.onclick = async () => {
+      await markAllAsIgnored(sections);
+      skipAllBtn.innerText = 'OK, Ignored';
     };
     return skipAllBtn;
   };
@@ -108,12 +106,18 @@ const setupPage = (sections: Section[]) => {
       .querySelector('.pagination.pagination_set-nav')!
       .appendChild(createSkipBtn());
   });
+
+  sections.forEach((section) => {
+    section.title.addEventListener('click', () => {
+      console.log(section);
+    });
+  });
 };
 
 const shouldHide = async (
   section: Section,
 ): Promise<{ entry: Entry[string]; fromHistory: boolean } | null> => {
-  const entry = await getEntry('buildingName', section.title.innerText);
+  const entry = await getEntry(section.title.innerText);
   if (entry) {
     return { entry, fromHistory: false };
   }
@@ -223,7 +227,7 @@ const apply = async (
 
   // register sections picked with history, to cope with real estate's re-uploading in the future
   unawareHistories.forEach((section) => {
-    setEntry('buildingName', section.title.innerText, 'visited');
+    setEntry(section.title.innerText, 'visited');
   });
 
   return { result: { ignored: ignoredCount, visited: visitedCount } };
@@ -234,14 +238,16 @@ const markAllAsIgnored = (sections: Section[]) => {
     if (section.container.classList.contains(hiddenSectionClassName)) {
       return;
     }
-    setEntry('buildingName', section.title.innerText, 'ignored');
+    setEntry(section.title.innerText, 'ignored');
   });
 };
 
 const extractSections = (): Section[] => {
   return [...document.querySelectorAll<HTMLElement>('.cassetteitem')].map(
     (section) => {
-      const name = section.querySelector<HTMLElement>('.cassetteitem_content');
+      const name = section.querySelector<HTMLElement>(
+        '.cassetteitem_content-title',
+      );
       const links = [
         ...section.querySelectorAll<HTMLAnchorElement>(
           "table.cassetteitem_other a[href*='/chintai']",
@@ -262,3 +268,6 @@ const extractSections = (): Section[] => {
   setupPage(allSections);
   setupPopover(allSections, result);
 })();
+
+// migration
+// Object.entries(await chrome.storage.sync.get()).filter(([k,v])=>k !== 'config').reduce((acc, [k, v])=>{const key = k.split(/[\t\n]+/)[2]; key===undefined && console.log(k); return {...acc, [key]: v}}, {})
