@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Suumo Unread Only",
+  "description": "Hide visited links in suumo.",
+  "version": "1.0",
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "permissions": ["history", "storage", "unlimitedStorage"],
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://suumo.jp/jj/chintai/ichiran/*"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
